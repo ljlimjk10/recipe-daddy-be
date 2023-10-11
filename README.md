@@ -25,6 +25,8 @@ Ctrl + Shift + `
 pip install -r requirements.txt
 ```
 
+Create .env according to stub.env
+
 ```bash
 python manage.py makemigrations recipe_daddy
 python manage.py migrate

@@ -13,14 +13,13 @@ class OwnerOrNoAccessToUser(permissions.BasePermission):
         
             return False
             
-class OwnerOrNoAccessToFile(permissions.BasePermission):
+class OwnerOrNoAccessToRecipe(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user
     
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS or request.method == "PUT" or request.method == "DELETE" or request.method == "GET":
-            print(obj.owner)
-            if obj.owner.email == request.user.email:
+            if obj.user.email == request.user.email:
                 return True
         
             return False

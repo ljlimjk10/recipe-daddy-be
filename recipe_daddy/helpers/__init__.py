@@ -1,0 +1,1 @@
+from recipe_daddy.helpers.mixins_helpers import MultipleFieldLookupMixin

@@ -13,13 +13,14 @@ class OwnerOrNoAccessToUser(permissions.BasePermission):
         
             return False
             
-class OwnerOrNoAccessToRecipe(permissions.BasePermission):
+
+class OwnerOrNoAccessToMealPlan(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user
+        return bool(request.user and request.user.is_authenticated)
     
-    def has_object_permission(self, request, view, obj):
+    def has_object_permission(self, request, obj):
         if request.method in permissions.SAFE_METHODS or request.method == "PUT" or request.method == "DELETE" or request.method == "GET":
             if obj.user.email == request.user.email:
                 return True
         
-            return False
+        return False

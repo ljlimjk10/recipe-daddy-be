@@ -13,6 +13,6 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('test', views.test_views.test, name='test_view'),
 
-    path('recipe/', views.recipe_views.RecipeList.as_view(), name='recipe_view'),
-    path('recipe/<int:pk>', views.recipe_views.RecipeDetails.as_view(), name='recipe_view'),
+    path('user-meal-plan', views.user_meal_plan_views.UserMealPlanViewSet.as_view(), name='user_meal_plan_view'),
+    path('user-meal-plan/<str:user__username>/<str:meal_date>', views.user_meal_plan_views.UserMealPlanViewSet.as_view(), name='user_meal_plan_view'),
 ]

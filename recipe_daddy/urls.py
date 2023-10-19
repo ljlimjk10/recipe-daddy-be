@@ -14,5 +14,4 @@ urlpatterns = [
     path('test', views.test_views.test, name='test_view'),
 
     path('user-meal-plan', views.user_meal_plan_views.UserMealPlanViewSet.as_view(), name='user_meal_plan_view'),
-    path('user-meal-plan/<str:user__username>/<str:meal_date>', views.user_meal_plan_views.UserMealPlanViewSet.as_view(), name='user_meal_plan_view'),
 ]

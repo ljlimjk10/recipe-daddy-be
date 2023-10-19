@@ -1,1 +1,2 @@
 from recipe_daddy.serializers.user_serializers import UserSerializer
+from recipe_daddy.serializers.user_meal_plan_serializers import UserMealPlanSerializer

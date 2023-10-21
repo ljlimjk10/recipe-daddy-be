@@ -1,14 +1,14 @@
-from rest_framework import mixins, generics
+from rest_framework import mixins, generics, status
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 
 from recipe_daddy.models.user_meal_plan_models import UserMealPlan
 from recipe_daddy.serializers.user_meal_plan_serializers import UserMealPlanSerializer
 from recipe_daddy.helpers.mixins_helpers import MultipleFieldLookupMixin
 from recipe_daddy.permissions import OwnerOrNoAccessToMealPlan
 
-# TODO user shld only have 1 breafast lunch dinner per day max
 
 class UserMealPlanViewSet(
                         MultipleFieldLookupMixin,
@@ -52,25 +52,67 @@ class UserMealPlanViewSet(
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
-        meal_type = request.data.get("meal_type")
-        meal_date = request.data.get("meal_date")
-        user = request.user
+        meal_plan_data = request.data
 
-        existing_meal_plan = UserMealPlan.objects.filter(
-                                user=user,
-                                meal_type=meal_type,
-                                meal_date=meal_date
-                            ).first()
-        if existing_meal_plan:
-            try:
-                existing_meal_plan.delete()
-            except Exception as e:
-                print(f"Error deleting meal plan: {e}")
+        if isinstance(meal_plan_data, list):
+            meal_plans = []
+            user = request.user
+            user_id = user.id
+            for meal_plan_item in meal_plan_data:
+                meal_type = meal_plan_item.get("meal_type")
+                meal_date = meal_plan_item.get("meal_date")
 
-        return super().create(request, *args, **kwargs)
-    
+                existing_meal_plan = UserMealPlan.objects.filter(
+                    user=user,
+                    meal_type=meal_type,
+                    meal_date=meal_date
+                ).first()
+
+                if existing_meal_plan:
+                    try:
+                        existing_meal_plan.delete()
+                    except Exception as e:
+                        print(f"Error deleting meal plan: {e}")
+
+                serializer = UserMealPlanSerializer(
+                    data={
+                        "user": user_id,
+                        "meal_type": meal_type,
+                        "meal_date": meal_date,
+                        "recipe_name": meal_plan_item.get("recipe_name"),
+                        "have_ingredients": meal_plan_item.get("have_ingredients"),
+                        "no_ingredients": meal_plan_item.get("no_ingredients"),
+                        "preparation_steps": meal_plan_item.get("preparation_steps"),
+                        "canMake": meal_plan_item.get("canMake"),
+                    }
+                )
+                if serializer.is_valid():
+                    serializer.save()
+                    meal_plans.append(serializer.data)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response(meal_plans, status=status.HTTP_201_CREATED)
+        else:
+            meal_type = meal_plan_data.get("meal_type")
+            meal_date = meal_plan_data.get("meal_date")
+            user_id = request.user.id
+
+            existing_meal_plan = UserMealPlan.objects.filter(
+                user_id=user_id,
+                meal_type=meal_type,
+                meal_date=meal_date
+            ).first()
+            if existing_meal_plan:
+                try:
+                    existing_meal_plan.delete()
+                except Exception as e:
+                    print(f"Error deleting meal plan: {e}")
+
+            return super().create(request, *args, **kwargs)
+
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 

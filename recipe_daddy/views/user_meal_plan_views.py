@@ -50,12 +50,26 @@ class UserMealPlanViewSet(
         return queryset
 
 
-    # only admin need this
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        meal_type = request.data.get("meal_type")
+        meal_date = request.data.get("meal_date")
+        user = request.user
+
+        existing_meal_plan = UserMealPlan.objects.filter(
+                                user=user,
+                                meal_type=meal_type,
+                                meal_date=meal_date
+                            ).first()
+        if existing_meal_plan:
+            try:
+                existing_meal_plan.delete()
+            except Exception as e:
+                print(f"Error deleting meal plan: {e}")
+
+        return super().create(request, *args, **kwargs)
     
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)

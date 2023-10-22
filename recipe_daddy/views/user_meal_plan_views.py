@@ -4,9 +4,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
-from recipe_daddy.models.user_meal_plan_models import UserMealPlan
+from recipe_daddy.models.user_models import User
+from recipe_daddy.models.user_meal_plan_models import UserMealPlan, MealTypes
 from recipe_daddy.serializers.user_meal_plan_serializers import UserMealPlanSerializer
 from recipe_daddy.helpers.mixins_helpers import MultipleFieldLookupMixin
+from recipe_daddy.helpers.user_meal_plan_helpers import handling_meal_type_existence, get_target_meal
 from recipe_daddy.permissions import OwnerOrNoAccessToMealPlan
 
 
@@ -37,9 +39,9 @@ class UserMealPlanViewSet(
 
         if pk is not None:
             return queryset.filter(pk=pk)
-
         if username is not None:
-            if self.request.user.is_authenticated and self.request.user.email == username:
+            curr_username = User.objects.get(email=self.request.user.email).username
+            if self.request.user.is_authenticated and curr_username == username:
                 if meal_date is not None:
                     queryset = queryset.filter(user__username=username, meal_date=meal_date)
                 else:
@@ -64,17 +66,7 @@ class UserMealPlanViewSet(
                 meal_type = meal_plan_item.get("meal_type")
                 meal_date = meal_plan_item.get("meal_date")
 
-                existing_meal_plan = UserMealPlan.objects.filter(
-                    user=user,
-                    meal_type=meal_type,
-                    meal_date=meal_date
-                ).first()
-
-                if existing_meal_plan:
-                    try:
-                        existing_meal_plan.delete()
-                    except Exception as e:
-                        print(f"Error deleting meal plan: {e}")
+                handling_meal_type_existence(user, meal_type, meal_date)
 
                 serializer = UserMealPlanSerializer(
                     data={
@@ -100,21 +92,74 @@ class UserMealPlanViewSet(
             meal_date = meal_plan_data.get("meal_date")
             user_id = request.user.id
 
-            existing_meal_plan = UserMealPlan.objects.filter(
-                user_id=user_id,
-                meal_type=meal_type,
-                meal_date=meal_date
-            ).first()
-            if existing_meal_plan:
-                try:
-                    existing_meal_plan.delete()
-                except Exception as e:
-                    print(f"Error deleting meal plan: {e}")
+            handling_meal_type_existence(user_id, meal_type, meal_date)
 
             return super().create(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # if update isCompleted to True
+        is_completed = serializer.validated_data.get("isCompleted", False)
+        meal_type = serializer.validated_data.get("meal_type", None)
+        meal_date = serializer.validated_data.get("meal_date", None)
+
+        if is_completed:
+            curr_completion_status = instance.isCompleted
+            if not curr_completion_status:
+                have_ingredients = instance.have_ingredients
+                additional_food_saved = sum(have_ingredients.values())
+
+                user = request.user
+                user.food_saved += additional_food_saved
+                user.save()
+                instance.isCompleted = True
+                instance.save()
+        
+        if meal_type and not meal_date:
+            curr_meal_type = instance.meal_type
+            curr_meal_date = instance.meal_date
+            if curr_meal_type != meal_type:
+                target_meal_plan_instance = get_target_meal(request.user, meal_type, curr_meal_date)
+                if target_meal_plan_instance:
+                    target_meal_completion_status = target_meal_plan_instance.isCompleted 
+                    if target_meal_completion_status:
+                        return Response(
+                            f"Unable to change meal_type to {MealTypes(meal_type).name} "
+                            f"as it is already marked as complete",
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                handling_meal_type_existence(request.user, meal_type, curr_meal_date)
+                serializer = UserMealPlanSerializer(instance, data={'meal_type': meal_type}, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        if meal_type and meal_date:
+            curr_meal_type = instance.meal_type
+            curr_meal_date = instance.meal_date
+            if curr_meal_date != meal_date:
+                target_meal_plan_instance = get_target_meal(request.user, meal_type, meal_date)
+                if target_meal_plan_instance:
+                    target_meal_completion_status = target_meal_plan_instance.isCompleted
+                    if target_meal_completion_status:
+                        return Response(
+                            f"Unable to change meal_type to {MealTypes(meal_type).name} "
+                            f"as it is already marked as complete",
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                handling_meal_type_existence(request.user, meal_type, curr_meal_date)
+                serializer = UserMealPlanSerializer(instance, data={'meal_type': meal_type}, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)

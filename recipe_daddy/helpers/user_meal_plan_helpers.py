@@ -37,7 +37,6 @@ def generate_meal_image(meal_name):
     load_dotenv()
     EDAMAM_APPLICATION_ID = os.getenv("EDAMAM_APPLICATION_ID")
     EDAMAM_APPLICATION_KEY = os.getenv("EDAMAM_APPLICATION_KEY")
-    print(EDAMAM_APPLICATION_ID, EDAMAM_APPLICATION_KEY)
     BASE_URL = "https://api.edamam.com/api/recipes/v2"
     query_params = {
         "type": "public",

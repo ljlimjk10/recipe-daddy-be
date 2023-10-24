@@ -11,6 +11,7 @@ class UserMealPlan(models.Model):
     meal_date = models.DateField()
     meal_type = models.CharField(max_length=10, choices=MealTypes.choices)
     recipe_name = models.CharField(max_length=255)
+    image_url = models.TextField(null=True, blank=True)
     have_ingredients = models.JSONField(null=True, blank=True)
     no_ingredients = models.JSONField(null=True, blank=True)
     preparation_steps = models.TextField(null=True, blank=True)

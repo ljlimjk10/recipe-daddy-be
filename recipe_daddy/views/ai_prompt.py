@@ -19,7 +19,7 @@ def get_ai_prompt(request):
         response = openai.ChatCompletion.create(
             model="gpt-4-0613",
             messages=[                
-                {"role": "system", "content": "You are a helpful recipe assistant. Only use the functions you have been provided with"},
+                {"role": "system", "content": "You are a helpful recipe assistant. Only use the functions you have been provided with"},                
                 {"role": "user", "content": user_message},
             ],
             functions=[{"name": "set_recipe", "parameters": schema, "outputs": schema}],

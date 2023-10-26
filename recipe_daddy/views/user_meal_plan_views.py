@@ -8,7 +8,7 @@ from recipe_daddy.models.user_models import User
 from recipe_daddy.models.user_meal_plan_models import UserMealPlan, MealTypes
 from recipe_daddy.serializers.user_meal_plan_serializers import UserMealPlanSerializer
 from recipe_daddy.helpers.mixins_helpers import MultipleFieldLookupMixin
-from recipe_daddy.helpers.user_meal_plan_helpers import handling_meal_type_existence, get_target_meal, generate_meal_image
+from recipe_daddy.helpers.user_meal_plan_helpers import handling_meal_type_existence, get_target_meal
 from recipe_daddy.permissions import OwnerOrNoAccessToMealPlan
 
 
@@ -77,16 +77,11 @@ class UserMealPlanViewSet(
                         "have_ingredients": meal_plan_item.get("have_ingredients"),
                         "no_ingredients": meal_plan_item.get("no_ingredients"),
                         "preparation_steps": meal_plan_item.get("preparation_steps"),
+                        "image_url": meal_plan_item.get("image_url", "www.google.com"),
                         "canMake": meal_plan_item.get("canMake"),
                     }
                 )
                 if serializer.is_valid():
-                    recipe_name = meal_plan_item.get("recipe_name")
-                    image_url, status_code = generate_meal_image(recipe_name)
-
-                    if image_url:
-                        serializer.validated_data["image_url"] = image_url
-
                     serializer.save()
                     meal_plans.append(serializer.data)
                 else:
@@ -94,34 +89,9 @@ class UserMealPlanViewSet(
 
             return Response(meal_plans, status=status.HTTP_201_CREATED)
         else:
-            meal_type = meal_plan_data.get("meal_type")
-            meal_date = meal_plan_data.get("meal_date")
             user_id = request.user.id
-
             handling_meal_type_existence(user_id, meal_type, meal_date)
-            serializer = UserMealPlanSerializer(
-                data={
-                    "user": user_id,
-                    "meal_type": meal_type,
-                    "meal_date": meal_date,
-                    "recipe_name": meal_plan_data.get("recipe_name"),
-                    "have_ingredients": meal_plan_data.get("have_ingredients"),
-                    "no_ingredients": meal_plan_data.get("no_ingredients"),
-                    "preparation_steps": meal_plan_data.get("preparation_steps"),
-                    "canMake": meal_plan_data.get("canMake"),
-                }
-            )
-            if serializer.is_valid():
-                recipe_name = meal_plan_data.get("recipe_name")
-                image_url, status_code = generate_meal_image(recipe_name)
-
-                if image_url:
-                    serializer.validated_data["image_url"] = image_url
-
-                serializer.save()
-                return super().create(request, *args, **kwargs)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return super().create(request, *args, **kwargs)
 
 
     def put(self, request, *args, **kwargs):

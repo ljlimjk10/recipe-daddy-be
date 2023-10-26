@@ -1,3 +1,3 @@
 from recipe_daddy.serializers.user_serializers import UserSerializer
 from recipe_daddy.serializers.user_meal_plan_serializers import UserMealPlanSerializer
-from recipe_daddy.serializers.leaderboard_serializers import LeaderboardSerializer
+# from recipe_daddy.serializers.leaderboard_serializers import LeaderboardSerializer

@@ -16,6 +16,7 @@ def get_ai_prompt(request):
     schema = data.get('schema', '')
     
     try:
+
         response = openai.ChatCompletion.create(
             model="gpt-4-0613",
             messages=[                

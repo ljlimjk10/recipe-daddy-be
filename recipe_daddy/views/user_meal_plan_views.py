@@ -65,6 +65,7 @@ class UserMealPlanViewSet(
             for meal_plan_item in meal_plan_data:
                 meal_type = meal_plan_item.get("meal_type")
                 meal_date = meal_plan_item.get("meal_date")
+                meal_date = meal_date.replace("/", "-")
 
                 handling_meal_type_existence(user, meal_type, meal_date)
 

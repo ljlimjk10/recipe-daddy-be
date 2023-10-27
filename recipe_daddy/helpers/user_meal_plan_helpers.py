@@ -100,7 +100,7 @@ def format_ingredients_to_gram(jsonObject):
         if jsonObject["no_ingredients"] is None:
             n_ingre = None            
         else:
-            for ingredient, qty in jsonObject["have_ingredients"].items():
+            for ingredient, qty in jsonObject["no_ingredients"].items():
                 n_ingre[ingredient] = input_unit_conversion(qty)
 
     # format back object with have_ingredients and no_ingredients to json Object

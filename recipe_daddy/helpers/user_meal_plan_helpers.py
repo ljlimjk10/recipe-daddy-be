@@ -1,5 +1,6 @@
 import os
 import requests
+import re
 from dotenv import load_dotenv
 from urllib.parse import quote
 
@@ -64,3 +65,45 @@ def generate_meal_image(meal_name):
         
     except Exception as _:
         return None, 404
+    
+def format_ingredients_to_gram(jsonObject):
+
+    def input_unit_conversion(input_string):
+        unit_conversion = {
+            "ml": 1,    
+            "l": 1000,  
+            "kg": 1000, 
+        }
+        input_string = input_string.lower()    
+        match = re.match(r"(\d+)([a-zA-Z]+)", input_string)
+
+        if match:
+            quantity = float(match.group(1))
+            unit = match.group(2)
+
+            if unit in unit_conversion:
+                grams = quantity * unit_conversion[unit]
+                return f"{grams}g"
+            else:
+                return "1EA"
+        else:
+            return "1EA"
+        
+    h_ingre = {}
+    n_ingre = {}
+    if "have_ingredients" in jsonObject: # check if key is present      
+        for ingredient, qty in jsonObject["have_ingredients"].items():
+            h_ingre[ingredient] = input_unit_conversion(qty)
+
+    if "no_ingredients" in jsonObject: # check if key is present
+        # check if null
+        if jsonObject["no_ingredients"] is None:
+            n_ingre = None            
+        else:
+            for ingredient, qty in jsonObject["have_ingredients"].items():
+                n_ingre[ingredient] = input_unit_conversion(qty)
+
+    # format back object with have_ingredients and no_ingredients to json Object
+    jsonObject["have_ingredients"] = h_ingre 
+    jsonObject["no_ingredients"] = n_ingre        
+    return jsonObject

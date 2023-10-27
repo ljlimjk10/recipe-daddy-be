@@ -16,8 +16,8 @@ def get_ai_prompt(request):
     schema = data.get('schema', '')
     
     try:
-        print(user_message)
-        print(schema)
+        if user_message and schema: print(f"Received userMsg and schema") 
+            
         response = openai.ChatCompletion.create(
             model="gpt-4-0613",
             messages=[                

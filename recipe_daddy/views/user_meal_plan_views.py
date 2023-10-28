@@ -3,12 +3,13 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from decimal import Decimal
 
 from recipe_daddy.models.user_models import User
 from recipe_daddy.models.user_meal_plan_models import UserMealPlan, MealTypes
 from recipe_daddy.serializers.user_meal_plan_serializers import UserMealPlanSerializer
 from recipe_daddy.helpers.mixins_helpers import MultipleFieldLookupMixin
-from recipe_daddy.helpers.user_meal_plan_helpers import handling_meal_type_existence, get_target_meal
+from recipe_daddy.helpers.user_meal_plan_helpers import handling_meal_type_existence, get_target_meal, format_ingredients_to_gram
 from recipe_daddy.permissions import OwnerOrNoAccessToMealPlan
 
 
@@ -108,10 +109,12 @@ class UserMealPlanViewSet(
             curr_completion_status = instance.isCompleted
             if not curr_completion_status:
                 have_ingredients = instance.have_ingredients
-                additional_food_saved = sum(have_ingredients.values())
+                formatted_have_ingredients = format_ingredients_to_gram(have_ingredients)
+                print(formatted_have_ingredients)
+                additional_food_saved = sum(formatted_have_ingredients.values())
 
                 user = request.user
-                user.food_saved += additional_food_saved
+                user.food_saved += Decimal(str(additional_food_saved))
                 user.save()
                 instance.isCompleted = True
                 instance.save()

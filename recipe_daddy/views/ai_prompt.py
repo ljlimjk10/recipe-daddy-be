@@ -1,9 +1,9 @@
+import replicate
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from rest_framework import status
-import openai
-import os
+import replicate
 
 @api_view(['POST'])
 def get_ai_prompt(request):
@@ -38,3 +38,6 @@ def get_ai_prompt(request):
         return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+def test_shit(request):
+    image_url, _ = generate_meal_image()
+    print(generate_meal_image("scrambled eggs with crab"))

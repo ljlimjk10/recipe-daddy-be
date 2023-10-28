@@ -1,6 +1,7 @@
 import os
 import requests
 import re
+import re
 from dotenv import load_dotenv
 from urllib.parse import quote
 
@@ -66,7 +67,7 @@ def generate_meal_image(meal_name):
     except Exception as _:
         return None, 404
     
-def format_ingredients_to_gram(jsonObject):
+def format_ingredients_to_gram(have_ingredients):
 
     def input_unit_conversion(input_string):
         unit_conversion = {
@@ -83,27 +84,26 @@ def format_ingredients_to_gram(jsonObject):
 
             if unit in unit_conversion:
                 grams = quantity * unit_conversion[unit]
-                return f"{grams}g"
+                return grams
             else:
-                return "1EA"
+                return 75 * quantity
         else:
-            return "1EA"
+            return 75 * float(qty)
         
     h_ingre = {}
     n_ingre = {}
-    if "have_ingredients" in jsonObject: # check if key is present      
-        for ingredient, qty in jsonObject["have_ingredients"].items():
-            h_ingre[ingredient] = input_unit_conversion(qty)
+    for ingredient, qty in have_ingredients.items():
+        h_ingre[ingredient] = input_unit_conversion(qty)
 
-    if "no_ingredients" in jsonObject: # check if key is present
-        # check if null
-        if jsonObject["no_ingredients"] is None:
-            n_ingre = None            
-        else:
-            for ingredient, qty in jsonObject["no_ingredients"].items():
-                n_ingre[ingredient] = input_unit_conversion(qty)
+    # if "no_ingredients" in jsonObject: # check if key is present
+    #     # check if null
+    #     if jsonObject["no_ingredients"] is None:
+    #         n_ingre = None            
+    #     else:
+    #         for ingredient, qty in jsonObject["have_ingredients"].items():
+    #             n_ingre[ingredient] = input_unit_conversion(qty)
 
     # format back object with have_ingredients and no_ingredients to json Object
-    jsonObject["have_ingredients"] = h_ingre 
-    jsonObject["no_ingredients"] = n_ingre        
-    return jsonObject
+    have_ingredients = h_ingre 
+    # jsonObject["no_ingredients"] = n_ingre        
+    return have_ingredients

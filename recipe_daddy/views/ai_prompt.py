@@ -1,6 +1,9 @@
+import replicate
 from rest_framework.response import Response
 from rest_framework import status
-import replicate
+
+from recipe_daddy.helpers.user_meal_plan_helpers import generate_meal_image
+
 
 def get_ai_prompt(request):
     print(request.body)
@@ -12,3 +15,6 @@ def get_ai_prompt(request):
 
 
 
+def test_shit(request):
+    image_url, _ = generate_meal_image()
+    print(generate_meal_image("scrambled eggs with crab"))

@@ -15,5 +15,5 @@ urlpatterns = [
 
     path('user-meal-plan', views.user_meal_plan_views.UserMealPlanViewSet.as_view(), name='user_meal_plan_view'),
 
-    # path('leaderboard', views.leaderboard_views.LeaderboardViewSet.as_view(), name='leaderboard_view'),
+    path('leaderboard', views.leaderboard_views.LeaderboardViewSet.as_view(), name='leaderboard_view'),
 ]

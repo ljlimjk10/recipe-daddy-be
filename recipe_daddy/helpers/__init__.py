@@ -1,2 +1,2 @@
 from recipe_daddy.helpers.mixins_helpers import MultipleFieldLookupMixin
-from recipe_daddy.helpers.user_meal_plan_helpers import handling_meal_type_existence, get_target_meal, generate_meal_image
+from recipe_daddy.helpers.user_meal_plan_helpers import handling_meal_type_existence, get_target_meal, generate_meal_image, format_ingredients_to_gram

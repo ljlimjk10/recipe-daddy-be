@@ -5,7 +5,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["username", "email", "first_name", "last_name", "food_saved", "password"]
+        fields = ["id", "username", "email", "first_name", "last_name", "food_saved", "password", "food_saved_goal"]
         extra_kwargs = {"password":{"write_only":True}, "food_saved": {"read_only": True}}
     
     def create(self,validated_data):
@@ -26,6 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance.first_name = validated_data.get("first_name", instance.first_name)
         instance.last_name = validated_data.get("last_name", instance.last_name)
         instance.food_saved = validated_data.get("food_saved", instance.food_saved)
+        instance.food_saved_goal = validated_data.get("food_saved_goal", instance.food_saved_goal)
         instance.set_password(validated_data.get("password", instance.password))
         instance.save()
         return instance

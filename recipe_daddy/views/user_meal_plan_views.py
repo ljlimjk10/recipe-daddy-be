@@ -57,6 +57,7 @@ class UserMealPlanViewSet(
 
     def post(self, request, *args, **kwargs):
         meal_plan_data = request.data
+        print(meal_plan_data)
 
         if isinstance(meal_plan_data, list):
             meal_plans = []
@@ -90,9 +91,35 @@ class UserMealPlanViewSet(
 
             return Response(meal_plans, status=status.HTTP_201_CREATED)
         else:
+            meal_plans = []
+            user = request.user
             user_id = request.user.id
-            handling_meal_type_existence(user_id, meal_type, meal_date)
-            return super().create(request, *args, **kwargs)
+            meal_type = meal_plan_data.get("meal_type")
+            meal_date = meal_plan_data.get("meal_date")
+            meal_date = meal_date.replace("/", "-")
+
+            handling_meal_type_existence(user, meal_type, meal_date)
+
+            serializer = UserMealPlanSerializer(
+                    data={
+                        "user": user_id,
+                        "meal_type": meal_type,
+                        "meal_date": meal_date,
+                        "recipe_name": meal_plan_data.get("recipe_name"),
+                        "have_ingredients": meal_plan_data.get("have_ingredients"),
+                        "no_ingredients": meal_plan_data.get("no_ingredients"),
+                        "preparation_steps": meal_plan_data.get("preparation_steps"),
+                        "image_url": meal_plan_data.get("image_url", "www.google.com"),
+                        "canMake": meal_plan_data.get("canMake"),
+                    }
+                )
+            if serializer.is_valid():
+                    serializer.save()
+                    meal_plans.append(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response(meal_plans, status=status.HTTP_201_CREATED)
 
 
     def put(self, request, *args, **kwargs):

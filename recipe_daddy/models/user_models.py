@@ -8,6 +8,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=150)
     food_saved = models.DecimalField(max_digits= 10, decimal_places=2, blank=True, default=0.00)
+    food_saved_goal = models.DecimalField(max_digits=10, decimal_places=2, blank=True, default=0.00)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

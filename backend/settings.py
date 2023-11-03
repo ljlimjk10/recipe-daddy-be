@@ -156,4 +156,5 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
 r"^https://\w+\.example\.com$",
+"http://localhost:5173",
 ]

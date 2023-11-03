@@ -33,8 +33,9 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# for ngrok dev environment
-ALLOWED_HOSTS = ['cda5-2401-7400-401a-5640-a1dc-a39e-c29e-93ca.ngrok-free.app']
+# for dev environment
+# TODO change to ec2 public ip after
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'recipe_daddy.User'
 
@@ -149,7 +150,8 @@ SIMPLE_JWT = {
 }
 
 
-# for dev environment
+# for dev environment 
+# TODO: change to frontend domain after
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGIN_REGEXES = [

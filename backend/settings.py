@@ -33,7 +33,8 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# for ngrok dev environment
+ALLOWED_HOSTS = ['cda5-2401-7400-401a-5640-a1dc-a39e-c29e-93ca.ngrok-free.app']
 
 AUTH_USER_MODEL = 'recipe_daddy.User'
 
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+
     "recipe_daddy"
 ]
 
@@ -60,7 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware"
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -146,8 +148,13 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-CORS_ALLOW_ALL_ORIGINS = True  # For development, allow all origins.
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Add the URL of your Vue.js app
+# for dev environment
+CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+r"^https://\w+\.example\.com$",
+"http://localhost:5173"
 ]
+

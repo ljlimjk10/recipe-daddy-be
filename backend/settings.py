@@ -152,8 +152,6 @@ SIMPLE_JWT = {
 # for dev environment 
 # TODO: change to frontend domain after
 CORS_ALLOW_ALL_ORIGINS = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
 CORS_ALLOWED_ORIGIN_REGEXES = [
 "http://localhost:5173",
 "http://recipe-daddy-static-website.s3-website-ap-southeast-1.amazonaws.com"

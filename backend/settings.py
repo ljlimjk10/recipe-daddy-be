@@ -34,8 +34,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DEBUG = True
 
 # for dev environment
-# TODO change to ec2 public ip after
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['54.254.165.97']
 
 AUTH_USER_MODEL = 'recipe_daddy.User'
 
@@ -153,8 +152,9 @@ SIMPLE_JWT = {
 # for dev environment 
 # TODO: change to frontend domain after
 CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
-r"^https://\w+\.example\.com$",
 "http://localhost:5173",
+"http://recipe-daddy-static-website.s3-website-ap-southeast-1.amazonaws.com"
 ]

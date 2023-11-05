@@ -1,20 +1,42 @@
 import replicate
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.http import JsonResponse
 from rest_framework import status
+import replicate
+import openai
+import os
 
-from recipe_daddy.helpers.user_meal_plan_helpers import generate_meal_image
-
-
+@api_view(['POST'])
 def get_ai_prompt(request):
-    print(request.body)
-    output = replicate.run(
-    "meta/llama-2-70b-chat:2c1608e18606fad2812020dc541930f2d0495ce32eee50074220b87300bc16e1",
-    input={"prompt": f"{request.body}"}
-    )
-    return Response("completed", status=status.HTTP_200_OK)
+    openai.api_key = os.getenv("OPENAI_API_TOKEN")
+    
 
+    # Receive the message from the request body
+    data = request.data
+    user_message = data.get('userPrompt', '')
+    schema = data.get('schema', '')
+    
+    try:
+        if user_message and schema: print(f"Received userMsg and schema") 
+            
+        response = openai.ChatCompletion.create(
+            model="gpt-4-0613",
+            messages=[                
+                {"role": "system", "content": "You are a helpful recipe assistant. Only use the functions you have been provided with"},                
+                {"role": "user", "content": user_message},
+            ],
+            functions=[{"name": "set_recipe", "parameters": schema, "outputs": schema}],
+            function_call={"name": "set_recipe"}
+        )
 
+        print(response.choices[0])
+       
+        response_message = response["choices"][0]["message"]["function_call"]["arguments"]               
 
-def test_shit(request):
-    image_url, _ = generate_meal_image()
-    print(generate_meal_image("scrambled eggs with crab"))
+        # Return the generated text as JSON response.
+        return JsonResponse({'generated_text': response_message}, status=200)        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

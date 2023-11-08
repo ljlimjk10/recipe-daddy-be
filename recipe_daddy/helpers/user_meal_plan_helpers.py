@@ -78,12 +78,14 @@ def format_ingredients_to_gram(have_ingredients):
             "g" : 1
         }
         input_string = input_string.lower()    
-        match = re.match(r"(\d+)([a-zA-Z]+)", input_string)
+        match = re.match(r"(\d+(\.\d+)?)\s*([a-zA-Z]+)", input_string)
 
         if match:
             quantity = float(match.group(1))
-            unit = match.group(2)
-
+            decimal_part = match.group(2)  # Optional, may be None
+            unit = match.group(3)
+            print(quantity)
+            print(unit)
             if unit in unit_conversion:
                 grams = quantity * unit_conversion[unit]
                 return grams
@@ -93,7 +95,7 @@ def format_ingredients_to_gram(have_ingredients):
             parts = input_string.split()
             if len(parts) > 0:
                 quantity = float(parts[0])
-                return 75 * quantity
+                return quantity
             else:
                 return 0
         

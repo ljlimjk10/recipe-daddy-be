@@ -88,7 +88,12 @@ def format_ingredients_to_gram(have_ingredients):
             else:
                 return 75 * quantity
         else:
-            return 75 * float(qty)
+            parts = input_string.split()
+            if len(parts) > 0:
+                quantity = float(parts[0])
+                return 75 * quantity
+            else:
+                return 0
         
     h_ingre = {}
     n_ingre = {}

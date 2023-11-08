@@ -74,7 +74,8 @@ def format_ingredients_to_gram(have_ingredients):
             "ml": 1,    
             "l": 1000,  
             "kg": 1000, 
-            "qty": 75 
+            "qty": 75,
+            "g" : 1
         }
         input_string = input_string.lower()    
         match = re.match(r"(\d+)([a-zA-Z]+)", input_string)

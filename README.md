@@ -2,6 +2,8 @@
 
 ## Installation
 
+Install postgreSQL if you don't have it installed and add it to your PATH environment variable
+
 Run postgreSQL locally
 
 ```bash
@@ -25,7 +27,9 @@ Ctrl + Shift + `
 pip install -r requirements.txt
 ```
 
-Create .env according to stub.env
+Create .env and fill it up according to stub.env
+
+Create database named after the DB_NAME in your newly created .env in psql shell or any GUI you opt for
 
 ```bash
 python manage.py makemigrations recipe_daddy
